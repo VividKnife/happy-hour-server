@@ -1,3 +1,69 @@
 type Query {
-  hello(subject: String): String
+  me: User
+  event: Event
+}
+
+type Mutation {
+  spendCredits(itemId: String!, amount: Int!): MutationResponse!
+  returnCredits(itemId: String!, amount: Int!): MutationResponse!
+  addItem(name: String!, url: String!, imageSrc: String!, price: Int!): MutationResponse!
+  createEvent(input: CreateEventRequest!): Event!
+  addUser(input: AddUserRequest!): User!
+}
+
+input AddUserRequest {
+  name: String!
+  email: String!
+  userName: String
+  initialCredits: Int!
+}
+
+input CreateEventRequest {
+  name: String!
+  description: String!
+  organizerEmail: String!
+  organizerName: String!
+  budget: Int!
+  startAt: Int!
+  endAt: Int!
+}
+
+type Subscription {
+  itemAdded: Item!
+  creditsChanged: User!
+}
+
+type MutationResponse {
+  success: Boolean!
+  message: String
+}
+
+type Item {
+  id: String!
+  price: Int!
+  url: String!
+  imageSrc: String!
+  name: String!
+  credits: Int!
+}
+
+type User {
+  name: String!
+  email: String!
+  userName: String!
+  initialCredits: Int!
+  currentCredits: Int!
+}
+
+type Event {
+  id: String!
+  name: String!
+  description: String!
+  organizerId: String!
+  organizerName: String!
+  organizerEmail: String!
+  budget: Int!
+  startAt: Int!
+  endAt: Int!
+  items: [Item]!
 }

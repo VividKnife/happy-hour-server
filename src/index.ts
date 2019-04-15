@@ -32,7 +32,7 @@ try {
     if (!module.hot || firstStartInDevMode) {
       console.log(`GraphQL Server is now running on http://localhost:${PORT}`);
       if (firstStartInDevMode) {
-        opn(`http://localhost:${PORT}/api/swagger`);
+        opn(`http://localhost:${PORT}/graphiql`);
       }
     }
 

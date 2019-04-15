@@ -1,7 +1,9 @@
 import { ApolloServer } from "apollo-server-express";
+import { PubSub } from "graphql-subscriptions";
 import * as GraphiQL from "apollo-server-module-graphiql";
 import * as cors from "cors";
 import * as express from "express";
+import * as cookie from "cookie-parser";
 
 import schema from "./schema";
 
@@ -9,6 +11,12 @@ import { execute, subscribe } from "graphql";
 import { createServer, Server } from "http";
 import { SubscriptionServer } from "subscriptions-transport-ws";
 import * as url from "url";
+import {
+  ConcreteUserAPI,
+  InMemoryDataModelProviderFactory,
+  ConcreteAdminAPI
+} from "happy-hour-core";
+import { Context } from "./types";
 
 type ExpressGraphQLOptionsFunction = (
   req?: express.Request,
@@ -35,11 +43,29 @@ export default async (port: number): Promise<Server> => {
   const app = express();
 
   const server: Server = createServer(app);
+  // TODO switch to a persist data provider.
+  const dataProviderFactory = new InMemoryDataModelProviderFactory();
+  const userAPI = new ConcreteUserAPI(dataProviderFactory);
+  const adminAPI = new ConcreteAdminAPI(dataProviderFactory);
+  const pubsub = new PubSub();
+  const context = async (input: any): Promise<Context> => {
+    const cookies = input.req.cookies;
+    return {
+      organizerId: cookies.organizerId,
+      userId: cookies.userId,
+      eventId: cookies.eventId,
+      pubsub,
+      userAPI,
+      adminAPI
+    };
+  };
 
   app.use("*", cors({ origin: "http://localhost:3000" }));
+  app.use(cookie());
 
   const apolloServer = new ApolloServer({
-    playground: false,
+    context,
+    playground: true,
     schema
   });
 

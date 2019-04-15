@@ -11,3 +11,6 @@ compiled
 .rpt2_cache
 docs
 build
+.cache
+.env
+build
